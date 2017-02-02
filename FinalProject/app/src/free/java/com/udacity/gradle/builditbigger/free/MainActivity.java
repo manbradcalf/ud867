@@ -7,6 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import com.udacity.gradle.builditbigger.R;
+
 public class MainActivity extends AppCompatActivity
 {
 

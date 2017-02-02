@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
-import android.support.v4.util.Pair;
 
 import junit.framework.Assert;
 
@@ -20,9 +19,8 @@ public class AsyncTaskTest
 {
     @Test
     public void TestAsync() throws Exception {
-        AsyncTask<Pair<Context, String>, Void, String> task = new EndpointsAsyncTask();
-        Pair pair = new Pair<>(InstrumentationRegistry.getContext(), "Test the toasty!");
-        task.execute(pair);
+        AsyncTask<Context, Void, String> task = new EndpointsAsyncTask();
+        task.execute(InstrumentationRegistry.getContext());
         String string = task.get();
         Assert.assertNotNull(string);
     }
