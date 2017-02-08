@@ -1,13 +1,19 @@
 package com.udacity.gradle.builditbigger.free;
 
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
+import com.udacity.gradle.builditbigger.EndpointsAsyncTask;
 import com.udacity.gradle.builditbigger.R;
 
 
@@ -16,6 +22,9 @@ import com.udacity.gradle.builditbigger.R;
  */
 public class MainActivityFragment extends Fragment {
 
+    Button tellJokeButton;
+    private InterstitialAd mInterstitialAd;
+
     public MainActivityFragment() {
     }
 
@@ -23,6 +32,35 @@ public class MainActivityFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
+        tellJokeButton = (Button) root.findViewById(R.id.joke_button);
+
+        mInterstitialAd = new InterstitialAd(getContext());
+        mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+
+        mInterstitialAd.setAdListener(new AdListener()
+        {
+            @Override
+            public void onAdClosed()
+            {
+                requestNewInterstitial();
+                tellJoke();
+            }
+        });
+
+        tellJokeButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                if (mInterstitialAd.isLoaded()) {
+                    mInterstitialAd.show();
+                } else {
+                    tellJoke();
+                }
+
+            }
+        });
+
 
         AdView mAdView = (AdView) root.findViewById(R.id.adView);
         // Create an ad request. Check logcat output for the hashed device ID to
@@ -33,5 +71,18 @@ public class MainActivityFragment extends Fragment {
                 .build();
         mAdView.loadAd(adRequest);
         return root;
+    }
+
+    public void tellJoke() {
+        AsyncTask<Context, Void, String> task = new EndpointsAsyncTask();
+        task.execute(getContext());
+    }
+
+    private void requestNewInterstitial() {
+        AdRequest adRequest = new AdRequest.Builder()
+                .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
+                .build();
+
+        mInterstitialAd.loadAd(adRequest);
     }
 }
