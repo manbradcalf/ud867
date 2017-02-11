@@ -44,5 +44,6 @@ dependencies {
     compile 'com.google.code.findbugs:jsr305:2.0.1'
     compile 'junit:junit:4.12'
     compile 'com.android.support:design:25.1.0'
+    compile 'com.android.support:support-v4:25.1.0'
     androidTestCompile 'junit:junit:4.12'
 }
