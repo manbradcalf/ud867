@@ -40,7 +40,7 @@ public class MyEndpoint
     public MyBean tellJoke()
     {
         MyBean response = new MyBean();
-        String joke = new javajokes().frayedKnot();
+        String joke = new javajokes().getJoke();
         response.setData(joke);
 
         return response;
