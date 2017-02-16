@@ -1,15 +1,16 @@
 package com.udacity.gradle.builditbigger;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
 import android.view.View;
 import android.widget.ProgressBar;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.extensions.android.json.AndroidJsonFactory;
-import com.manbradcalf.android.androidjokes.JokeActivity;
 import com.manbradcalf.android.finalproject.backend.myApi.MyApi;
+import com.udacity.gradle.builditbigger.free.JokeRetrievedEvent;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
 
@@ -20,13 +21,9 @@ import java.io.IOException;
 public class EndpointsAsyncTask extends AsyncTask<Context, Void, String>
 {
     private static MyApi myApiService = null;
-    private Context context;
     private ProgressBar progressBar;
-    private static String JOKE_KEY = "joke";
 
-
-    public EndpointsAsyncTask(Context context, ProgressBar progressBar) {
-        this.context = context;
+    public void setProgressBar(ProgressBar progressBar) {
         this.progressBar = progressBar;
     }
 
@@ -51,8 +48,6 @@ public class EndpointsAsyncTask extends AsyncTask<Context, Void, String>
             myApiService = builder.build();
         }
 
-        context = params[0];
-
         try
         {
             return myApiService.tellJoke().execute().getData();
@@ -69,9 +64,9 @@ public class EndpointsAsyncTask extends AsyncTask<Context, Void, String>
         if (progressBar != null) {
             progressBar.setVisibility(View.GONE);
         }
-        Intent intent = new Intent(context, JokeActivity.class);
-        intent.putExtra(JOKE_KEY, result);
-        context.startActivity(intent);
+        // Post the result to the event bus, so we can start the JokeActivity
+        // from the Fragment which calls this task.
+        EventBus.getDefault().post(new JokeRetrievedEvent(result));
     }
 }
 

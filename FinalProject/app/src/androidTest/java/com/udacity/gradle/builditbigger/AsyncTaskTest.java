@@ -21,7 +21,13 @@ public class AsyncTaskTest
     public void TestAsync() throws Exception {
         AsyncTask<Context, Void, String> task = new EndpointsAsyncTask();
         task.execute(InstrumentationRegistry.getContext());
-        String string = task.get();
-        Assert.assertNotNull(string);
+        String result = null;
+        try
+        {
+            result = task.get();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        Assert.assertNotNull(result);
     }
 }

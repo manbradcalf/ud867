@@ -1,7 +1,6 @@
 package com.udacity.gradle.builditbigger.free;
 
-import android.content.Context;
-import android.os.AsyncTask;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -14,24 +13,52 @@ import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.InterstitialAd;
+import com.manbradcalf.android.androidjokes.JokeActivity;
 import com.udacity.gradle.builditbigger.EndpointsAsyncTask;
 import com.udacity.gradle.builditbigger.R;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class MainActivityFragment extends Fragment
+{
 
     InterstitialAd mInterstitialAd;
     Button mTellJokeButton;
     ProgressBar mProgressBar;
-    public MainActivityFragment() {
+
+    public MainActivityFragment()
+    {
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Subscribe
+    public void onMessageEvent(JokeRetrievedEvent jokeRetrievedEvent) {
+        Intent intent = new Intent(getContext(), JokeActivity.class);
+        intent.putExtra(JokeActivity.JOKE_KEY, jokeRetrievedEvent.getJoke());
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        this.startActivity(intent);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             Bundle savedInstanceState)
+    {
         View root = inflater.inflate(R.layout.fragment_main, container, false);
 
         mProgressBar = (ProgressBar) root.findViewById(R.id.progress_bar);
@@ -42,9 +69,12 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onClick(View v)
             {
-                if (mInterstitialAd.isLoaded()) {
+                if (mInterstitialAd.isLoaded())
+                {
                     mInterstitialAd.show();
-                } else {
+                }
+                else
+                {
                     tellJoke();
                 }
             }
@@ -76,7 +106,8 @@ public class MainActivityFragment extends Fragment {
         return root;
     }
 
-    private void requestNewInterstitial() {
+    private void requestNewInterstitial()
+    {
         AdRequest adRequest = new AdRequest.Builder()
                 .addTestDevice(AdRequest.DEVICE_ID_EMULATOR)
                 .build();
@@ -84,8 +115,10 @@ public class MainActivityFragment extends Fragment {
         mInterstitialAd.loadAd(adRequest);
     }
 
-    public void tellJoke() {
-        AsyncTask<Context, Void, String> task = new EndpointsAsyncTask(getContext(), mProgressBar);
+    public void tellJoke()
+    {
+        EndpointsAsyncTask task = new EndpointsAsyncTask();
+        task.setProgressBar(mProgressBar);
         task.execute(getContext());
     }
 }
